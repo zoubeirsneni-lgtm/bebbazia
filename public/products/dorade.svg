@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e2f1f2"/><stop offset="1" stop-color="#bedfe2"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="680" cy="90" r="150" fill="#a4d3d6" opacity="0.45"/>
+  <circle cx="90" cy="530" r="130" fill="#a4d3d6" opacity="0.35"/>
+  <circle cx="740" cy="500" r="70" fill="#a4d3d6" opacity="0.30"/>
+  
+      
+  <ellipse cx="400" cy="470" rx="200" ry="26" fill="#000000" opacity="0.10"/>
+  <circle cx="400" cy="300" r="175" fill="#ffffff"/>
+  <circle cx="400" cy="300" r="150" fill="#f7f8f4"/>
+  <circle cx="400" cy="300" r="150" fill="none" stroke="#e8ece2" stroke-width="2"/>
+      <g transform="rotate(-8 400 300)">
+        <path d="M300 300 Q 360 252 440 268 Q 480 276 496 262 L 486 300 L 496 338 Q 480 324 440 332 Q 360 348 300 300 Z" fill="#e8b06b"/>
+        <path d="M300 300 Q 360 252 440 268 Q 480 276 496 262 L 486 300 L 496 338 Q 480 324 440 332 Q 360 348 300 300 Z" fill="none" stroke="#d19a52" stroke-width="4"/>
+        <path d="M330 292 q26 -14 52 -4 M340 306 q26 -12 52 -2" stroke="#c4884a" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="318" cy="294" r="5" fill="#5b4630"/>
+      </g>
+      <circle cx="472" cy="352" r="16" fill="#f4d06f"/><circle cx="496" cy="342" r="13" fill="#f4d06f"/>
+      
+  <g transform="translate(300,218) scale(0.85)" fill="#6fa08a" opacity="0.9">
+    <path d="M0 0 C 18 -26, 52 -30, 66 -14 C 58 12, 22 20, 0 0 Z"/>
+    <path d="M14 -6 C 30 -14, 48 -14, 60 -10" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <g transform="translate(486,226) scale(-0.7)" fill="#6fa08a" opacity="0.7">
+    <path d="M0 0 C 18 -26, 52 -30, 66 -14 C 58 12, 22 20, 0 0 Z"/>
+    <path d="M14 -6 C 30 -14, 48 -14, 60 -10" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>

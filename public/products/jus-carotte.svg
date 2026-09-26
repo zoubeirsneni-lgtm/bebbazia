@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdeede"/><stop offset="1" stop-color="#f8d7b4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="680" cy="90" r="150" fill="#f2c79a" opacity="0.45"/>
+  <circle cx="90" cy="530" r="130" fill="#f2c79a" opacity="0.35"/>
+  <circle cx="740" cy="500" r="70" fill="#f2c79a" opacity="0.30"/>
+  
+      
+  <ellipse cx="400" cy="470" rx="200" ry="26" fill="#000000" opacity="0.10"/>
+  <circle cx="400" cy="300" r="175" fill="#ffffff"/>
+  <circle cx="400" cy="300" r="150" fill="#f7f8f4"/>
+  <circle cx="400" cy="300" r="150" fill="none" stroke="#e8ece2" stroke-width="2"/>
+      <g>
+        <path d="M330 210 L 470 210 L 452 400 Q 448 416 430 416 L 370 416 Q 352 416 348 400 Z" fill="#ffffff"/>
+        <path d="M337 258 L 463 258 L 450 398 Q 447 410 434 410 L 366 410 Q 353 410 350 398 Z" fill="#f0a54f"/>
+        <path d="M337 258 L 463 258 L 461 278 L 339 278 Z" fill="#f5bd78"/>
+        <rect x="452" y="180" width="14" height="120" rx="7" fill="#7fae5e" transform="rotate(14 459 240)"/>
+        <circle cx="385" cy="305" r="11" fill="#e8924a" opacity="0.75"/><circle cx="418" cy="332" r="8" fill="#e8924a" opacity="0.75"/>
+      </g>
+      <g transform="translate(288,230) rotate(-24)">
+        <path d="M0 0 C 10 -34, 40 -34, 46 -4 C 34 16, 10 18, 0 0 Z" fill="#e8924a"/>
+        <path d="M40 -30 q14 -18 30 -12 M36 -18 q16 -12 30 -4" stroke="#7fae5e" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>
+      
+  <g transform="translate(490,240) scale(-0.8)" fill="#c98744" opacity="0.7">
+    <path d="M0 0 C 18 -26, 52 -30, 66 -14 C 58 12, 22 20, 0 0 Z"/>
+    <path d="M14 -6 C 30 -14, 48 -14, 60 -10" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>

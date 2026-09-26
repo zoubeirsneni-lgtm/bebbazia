@@ -1,0 +1,165 @@
+// BEBBA Healthy Food — Schéma de base de données
+// Bloc 1 : Catalogue (catégories #9, produits #10 du cahier des charges)
+// Convention prix : montants stockés en millimes (entier, TND à 3 décimales)
+// pour une précision financière déterministe (règles #65 et #179 du CDC).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Catalogue ───────────────────────────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?   // nom d'icône lucide, ex: "Salad"
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  description  String?
+  price        Int       // millimes TND (ex: 12500 = 12,500 DT)
+  imageUrl     String?
+  categoryId   String
+  category     Category  @relation(fields: [categoryId], references: [id])
+  isAvailable  Boolean   @default(true)
+  isActive     Boolean   @default(true)
+  sortOrder    Int       @default(0)
+  // Champs du CDC #10 — stockés en JSON sérialisé (SQLite n'accepte pas les listes primitives)
+  composition  String?   // JSON: string[] — ingrédients principaux
+  nutrition    String?   // JSON: {calories, protein, carbs, fat} par portion
+  allergens    String?   // JSON: string[] — allergènes (CDC #170)
+  prepMinutes  Int       @default(20) // temps de préparation indicatif (CDC #154)
+  options      ProductOption[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([categoryId])
+}
+
+// ─── Personnalisation (CDC #11 / #12) ────────────────────────────────────────
+// Un seul et même système d'options pour les parcours « Commander » et
+// « Personnaliser » (CDC #11.3). Chaque option définit sa disponibilité, son
+// éventuel supplément de prix et ses limites quantitatives (CDC #12).
+
+model ProductOption {
+  id              String  @id @default(cuid())
+  productId       String
+  product         Product @relation(fields: [productId], references: [id])
+  name            String
+  priceAdjustment Int     @default(0) // millimes — supplément de prix (CDC #12)
+  isAvailable     Boolean @default(true)
+  maxQuantity     Int     @default(1) // limite quantitative (CDC #12)
+  sortOrder       Int     @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// ─── Commandes (CDC #14 à #20, #63, #64, #66, #67, #85) ─────────────────────
+// Statuts officiels, casse obligatoire (CDC #14 / #247) :
+// received | preparing | ready | waiting_for_driver | delivering | delivered | cancelled
+// Paiement COD (CDC #17 / #18) : to_collect | paid — livraison ≠ encaissement.
+
+model Order {
+  id              String        @id @default(cuid())
+  number          String        @unique // numéro officiel (CDC #19)
+  trackingToken   String        @unique // 8 caractères (CDC #20)
+  status          String        @default("received")
+  // Client — identifiant = téléphone international normalisé (CDC #7), nom facultatif (CDC #8)
+  customerPhone   String
+  customerName    String?
+  deliveryAddress String
+  addressNotes    String?
+  addressLat      Float?
+  addressLng      Float?
+  zoneId          String?
+  zone            DeliveryZone? @relation(fields: [zoneId], references: [id])
+  // Décomposition du total en millimes (CDC #65 / #66)
+  productsTotal       Int
+  customizationsTotal Int     @default(0)
+  supplementsTotal    Int     @default(0)
+  deliveryFee         Int     @default(0)
+  promotionsTotal     Int     @default(0) // moteur de promotions — Bloc 8 (CDC #42)
+  adjustmentsTotal    Int     @default(0)
+  total               Int
+  // Paiement COD (CDC #17 / #18)
+  paymentStatus   String  @default("to_collect")
+  amountToCollect Int
+  amountCollected Int     @default(0)
+  // Idempotence globale (CDC #85)
+  idempotencyKey  String? @unique
+  // Chronologie conservée (CDC #63) via OrderEvent
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items  OrderItem[]
+  events OrderEvent[]
+
+  @@index([customerPhone])
+  @@index([status])
+}
+
+model OrderItem {
+  id          String @id @default(cuid())
+  orderId     String
+  order       Order  @relation(fields: [orderId], references: [id])
+  productId   String
+  productName String // instantané (snapshot) — le catalogue peut évoluer après commande
+  unitPrice   Int    // instantané du prix de base en millimes
+  quantity    Int
+  options     String // JSON: [{optionId, name, priceAdjustment, quantity}]
+  lineTotal   Int    // (unitPrice + Σ priceAdjustment × qtyOption) × quantity
+
+  @@index([orderId])
+}
+
+// Chronologie des événements d'une commande (CDC #63)
+model OrderEvent {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  type       String   // created | status_change | note
+  fromStatus String?
+  toStatus   String?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// Zones de livraison configurables (CDC #67 / #150) — valeurs provisoires en
+// attendant la décision du restaurant (aucune supposition — CDC #229).
+model DeliveryZone {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  feeMillimes Int     @default(0)
+  isActive    Boolean @default(true)
+  sortOrder   Int     @default(0)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Configuration clé/valeur (horaires CDC #148, commande minimale CDC #151, etc.)
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

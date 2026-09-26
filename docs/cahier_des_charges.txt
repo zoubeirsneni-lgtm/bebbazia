@@ -1,0 +1,2316 @@
+# RAPPORT FINAL ABSOLU + LES 6 CLARIFICATIONS + CORRECTIONS V2
+
+## BEBBA Healthy Food
+
+### « Vos Plats santé en un clic »
+
+---
+
+# 1. OBJET DU CAHIER DES CHARGES
+
+Le présent document constitue le cahier des charges fonctionnel, métier et technique de référence pour la conception, le développement, les tests, le déploiement et l'exploitation de BEBBA Healthy Food.
+
+Il consolide les exigences issues des cahiers des charges précédents, les clarifications définitivement décidées et les corrections ajoutées lors des dernières révisions.
+
+Toute formulation antérieure contradictoire avec le présent document est remplacée par la règle définie ici.
+
+---
+
+# 2. PRINCIPES MÉTIER FONDAMENTAUX
+
+* Les plats sont préparés après commande.
+* Aucun plat ne doit être considéré comme préparé à l'avance.
+* Le paiement de la V1 est effectué à la livraison par paiement à la livraison (COD).
+* La livraison et l'encaissement sont deux opérations distinctes.
+* Une commande livrée n'est donc pas automatiquement considérée comme encaissée.
+* Le système doit conserver séparément l'état de livraison et l'état d'encaissement.
+* Le Super Administrateur dispose de l'accès absolu prévu par le présent cahier.
+* Toutes les opérations sensibles doivent être traçables.
+* Les contrôles d'autorisation doivent être appliqués côté interface et côté serveur.
+
+---
+
+# 3. SLOGAN OFFICIEL
+
+Le slogan officiel est exactement :
+
+**« Vos Plats santé en un clic »**
+
+Cette formulation ne doit pas être modifiée.
+
+---
+
+# 4. RÔLES PRINCIPAUX
+
+Le système comprend au minimum :
+
+* Client ;
+* Cuisine / KDS ;
+* Livreur ;
+* Administration ;
+* Super Administrateur.
+
+Les droits sont déterminés par le rôle et les permissions associées.
+
+---
+
+# 5. SUPER ADMINISTRATEUR
+
+Le Super Administrateur dispose d'un accès absolu aux fonctions administratives autorisées par le système.
+
+Il peut notamment :
+
+* consulter les commandes ;
+* consulter et gérer la cuisine ;
+* consulter et gérer les livreurs ;
+* gérer les stocks ;
+* gérer les produits ;
+* gérer les ingrédients ;
+* gérer les clients ;
+* superviser les livraisons ;
+* superviser les encaissements ;
+* affecter un livreur ;
+* réaffecter un livreur ;
+* confirmer une livraison lorsque nécessaire ;
+* confirmer un encaissement lorsque nécessaire ;
+* consulter les historiques ;
+* consulter les journaux d'audit ;
+* administrer les utilisateurs et permissions selon les règles définies.
+
+---
+
+# 6. CLIENT
+
+Le client doit pouvoir :
+
+* consulter le catalogue ;
+* consulter les catégories ;
+* consulter les produits ;
+* consulter les détails des produits ;
+* personnaliser les produits lorsque des options sont disponibles ;
+* ajouter des produits au panier ;
+* modifier son panier ;
+* passer une commande ;
+* suivre sa commande ;
+* consulter son historique ;
+* créer une réclamation selon les règles définies ;
+* consulter sa réclamation ;
+* recevoir les notifications autorisées.
+
+La création d'un compte est le parcours privilégié pour permettre la fidélisation et les avantages commerciaux.
+
+La commande invité reste possible lorsque cette fonctionnalité est activée.
+
+---
+
+# 7. IDENTIFICATION CLIENT PAR TÉLÉPHONE
+
+L'identifiant client est construit à partir du numéro de téléphone international complet.
+
+Le format de référence recommandé est :
+
+`00 + indicatif pays + numéro national`
+
+sans :
+
+* signe `+` ;
+* espace ;
+* séparateur.
+
+Exemple :
+
+`+216 98123456`
+
+devient :
+
+`0021698123456`
+
+Le client ne choisit pas son identifiant.
+
+Un même numéro international normalisé ne peut correspondre qu'à un seul client.
+
+---
+
+# 8. INFORMATIONS CLIENT OBLIGATOIRES
+
+Le téléphone et l'adresse de livraison sont obligatoires pour une commande nécessitant une livraison.
+
+Le nom peut être facultatif lorsque les règles métier correspondantes le permettent.
+
+---
+
+# 9. CATÉGORIES
+
+Les catégories métier comprennent notamment :
+
+* Healthy ;
+* Grillades ;
+* Enfants ;
+* Jus détox ;
+* Régime complet 30 jours.
+
+Le système doit permettre l'évolution du catalogue sans nécessiter une modification structurelle de l'application.
+
+---
+
+# 10. PRODUITS ET CATALOGUE
+
+Chaque produit peut comporter :
+
+* nom ;
+* description ;
+* prix ;
+* image ;
+* catégorie ;
+* disponibilité ;
+* composition ;
+* recette ;
+* options ;
+* suppléments ;
+* informations nutritionnelles lorsque disponibles ;
+* allergènes lorsque définis ;
+* informations nécessaires à la production.
+
+Le cycle de vie d'un produit doit permettre son activation et sa désactivation selon les permissions.
+
+---
+
+# 11. ACTIONS PRODUIT — COMMANDER ET PERSONNALISER
+
+Chaque produit présenté dans le menu doit afficher explicitement :
+
+* **« Commander »**
+* **« Personnaliser »**
+
+Les deux actions sont distinctes mais doivent utiliser le même système de personnalisation.
+
+## 11.1 Bouton « Personnaliser »
+
+Lorsque le client clique sur **« Personnaliser »** :
+
+1. la fenêtre/interface de personnalisation s'ouvre ;
+2. les options autorisées sont affichées ;
+3. le client sélectionne ses choix ;
+4. les éventuels suppléments payants sont affichés ;
+5. le prix est recalculé ;
+6. le client peut ajouter le produit personnalisé au panier.
+
+## 11.2 Bouton « Commander »
+
+Lorsque le client clique sur **« Commander »**, une fenêtre de commande doit s'ouvrir.
+
+**Le produit n'est pas considéré comme définitivement confirmé immédiatement.**
+
+Cette fenêtre doit également permettre au client de :
+
+* conserver le produit tel quel ;
+* personnaliser le produit ;
+* ajouter ou retirer les options autorisées ;
+* sélectionner les suppléments disponibles ;
+* voir le prix recalculé ;
+* confirmer ensuite.
+
+Le parcours est donc :
+
+**Menu → Commander → Fenêtre de commande → Personnalisation éventuelle → Vérification → Confirmation**
+
+## 11.3 Cohérence des deux parcours
+
+Les deux parcours doivent aboutir au même mécanisme :
+
+**Menu → Personnaliser → Personnalisation → Panier**
+
+ou :
+
+**Menu → Commander → Fenêtre de commande → Personnalisation éventuelle → Panier/confirmation**
+
+Il ne doit pas exister deux systèmes de personnalisation différents.
+
+---
+
+# 12. PERSONNALISATION
+
+Les options peuvent notamment comprendre :
+
+* portion supplémentaire de protéines ;
+* supplément de légumes ;
+* supplément payant ;
+* autres options configurées pour le produit.
+
+Chaque option doit définir :
+
+* sa disponibilité ;
+* son éventuel supplément de prix ;
+* ses éventuelles contraintes ;
+* ses éventuelles limites quantitatives.
+
+---
+
+# 13. PANIER
+
+Le panier doit :
+
+* conserver les produits ;
+* conserver les quantités ;
+* conserver les personnalisations ;
+* recalculer les montants ;
+* afficher les suppléments ;
+* permettre la modification ;
+* permettre la suppression ;
+* conserver les informations nécessaires à la commande finale.
+
+Deux produits identiques avec des personnalisations différentes doivent pouvoir être distingués.
+
+---
+
+# 14. STATUTS DES COMMANDES
+
+Les statuts officiels des commandes sont exclusivement :
+
+`received`
+
+`preparing`
+
+`ready`
+
+`waiting_for_driver`
+
+`delivering`
+
+`delivered`
+
+`cancelled`
+
+La casse est obligatoire.
+
+---
+
+# 15. RÉFÉRENCE UNIQUE DES STATUTS
+
+Les statuts précédents constituent la référence unique pour les commandes.
+
+Les anciennes formulations :
+
+* `RECEIVED` ;
+* `Reçue` ;
+* ou toute autre variation
+
+ne doivent pas être utilisées comme valeurs officielles.
+
+---
+
+# 16. CYCLE DE COMMANDE
+
+Le cycle nominal est :
+
+`received → preparing → ready → waiting_for_driver → delivering → delivered`
+
+Une commande peut également passer à :
+
+`cancelled`
+
+selon les règles de cancellation applicables.
+
+---
+
+# 17. PAIEMENT COD
+
+La V1 utilise le paiement à la livraison.
+
+Le système doit distinguer :
+
+* montant à encaisser ;
+* montant encaissé ;
+* statut d'encaissement.
+
+Les statuts de paiement sont :
+
+`to_collect`
+
+et
+
+`paid`
+
+Une livraison réussie ne modifie pas automatiquement le statut de paiement.
+
+---
+
+# 18. LIVRAISON ET ENCAISSEMENT
+
+La livraison et l'encaissement sont indépendants.
+
+Le système doit pouvoir représenter notamment :
+
+* livré / non encaissé ;
+* livré / encaissé ;
+* non livré / non encaissé.
+
+Le Super Administrateur doit pouvoir intervenir lorsque le livreur ne peut pas finaliser une opération autorisée.
+
+---
+
+# 19. NUMÉRO OFFICIEL DE COMMANDE
+
+Chaque commande doit posséder un identifiant/numéro officiel permettant :
+
+* l'identification ;
+* le suivi ;
+* la recherche ;
+* la communication avec le client ;
+* la traçabilité ;
+* le rapprochement avec les opérations associées.
+
+---
+
+# 20. TRACKING
+
+Chaque commande suivable doit disposer d'un `trackingToken` de 8 caractères.
+
+La clé locale de référence est :
+
+`bebba_last_tracking_token`
+
+Le fallback de démonstration est :
+
+`tk_bebba_1047_demo`
+
+Lorsque `?token=` est fourni, il doit être prioritaire selon les règles de tracking.
+
+---
+
+# 21. CUISINE / KDS
+
+La cuisine doit pouvoir :
+
+* consulter les commandes reçues ;
+* voir les commandes à préparer ;
+* démarrer la préparation ;
+* terminer la préparation ;
+* faire progresser la commande selon la machine d'état ;
+* voir les informations nécessaires à la production.
+
+Lorsque la cuisine passe une commande à **« En préparation »**, la consommation du stock définie au point #10 est déclenchée.
+
+---
+
+# 22. CONSOMMATION DU STOCK — RÈGLE DÉFINITIVE #10
+
+Le stock est consommé **au moment exact où la cuisine clique sur « En préparation »**.
+
+La transition :
+
+`received → preparing`
+
+déclenche la consommation correspondant à la commande.
+
+La consommation :
+
+* ne doit être effectuée qu'une seule fois ;
+* doit être transactionnelle ;
+* doit être idempotente ;
+* doit être traçable ;
+* ne doit pas être répétée lors d'une répétition de requête.
+
+Aucun autre moment ne doit provoquer une seconde consommation pour la même opération.
+
+---
+
+# 23. INGREDIENTS
+
+Le système doit permettre de gérer les ingrédients, leurs unités, coûts, seuils, stocks, mouvements et relations avec les recettes.
+
+---
+
+# 24. INGREDIENTS — MODE READ ONLY
+
+Un utilisateur disposant uniquement de la permission **READ ONLY** peut consulter les informations autorisées concernant les ingrédients.
+
+Il peut notamment :
+
+* voir la liste ;
+* rechercher ;
+* consulter le détail ;
+* consulter l'unité ;
+* consulter le coût lorsque son rôle l'autorise ;
+* consulter le stock lorsque son rôle l'autorise ;
+* consulter le seuil d'alerte lorsque son rôle l'autorise.
+
+Il ne peut pas :
+
+* ajouter ;
+* modifier ;
+* supprimer ;
+* modifier le coût ;
+* modifier l'unité ;
+* modifier le seuil ;
+* modifier les données de l'ingrédient ;
+* effectuer un mouvement de stock ;
+* effectuer un réapprovisionnement ;
+* modifier ou supprimer l'historique.
+
+Le mode `READ ONLY` doit être appliqué :
+
+* dans l'interface ;
+* dans les permissions ;
+* côté API ;
+* côté serveur.
+
+Masquer un bouton ne constitue pas une mesure de sécurité suffisante.
+
+---
+
+# 25. STOCK
+
+Le système doit gérer :
+
+* stock courant ;
+* seuil d'alerte ;
+* mouvements ;
+* réapprovisionnements ;
+* consommations ;
+* inventaires ;
+* pertes ;
+* gaspillage ;
+* historique.
+
+Les opérations sensibles doivent être traçables.
+
+---
+
+# 26. UNITÉS ET CONVERSIONS
+
+Les unités d'ingrédients doivent être explicites.
+
+Les conversions nécessaires doivent être définies de manière déterministe.
+
+Aucune conversion implicite non définie ne doit être effectuée.
+
+---
+
+# 27. RECETTES
+
+Chaque recette doit permettre d'identifier :
+
+* le produit ;
+* les ingrédients ;
+* les quantités ;
+* les unités ;
+* les éventuelles versions ;
+* les informations nécessaires au calcul théorique du coût.
+
+Les modifications de recette doivent être historisées lorsque cela est nécessaire à la traçabilité.
+
+---
+
+# 28. COÛT THÉORIQUE
+
+Le système doit permettre de calculer le coût théorique des produits à partir des recettes et des coûts d'ingrédients applicables.
+
+---
+
+# 29. FOURNISSEURS
+
+Le système doit permettre la gestion des fournisseurs et des opérations liées au réapprovisionnement.
+
+---
+
+# 30. LIVREURS — GESTION
+
+L'administration autorisée doit pouvoir :
+
+* ajouter un livreur ;
+* modifier un livreur ;
+* activer un livreur ;
+* désactiver un livreur ;
+* réactiver un livreur ;
+* supprimer ou archiver un livreur selon la politique de conservation ;
+* gérer les informations autorisées ;
+* gérer les informations de connexion selon les permissions ;
+* consulter son activité ;
+* l'affecter à une commande ;
+* le réaffecter.
+
+---
+
+# 31. DÉSACTIVATION D'UN LIVREUR
+
+La désactivation :
+
+* ne supprime pas le livreur ;
+* conserve son historique ;
+* empêche son utilisation lorsque les règles métier l'interdisent ;
+* permet une réactivation ultérieure.
+
+La désactivation est différente de la suppression.
+
+---
+
+# 32. SUPPRESSION / ARCHIVAGE D'UN LIVREUR
+
+La suppression physique ne doit pas détruire les informations historiques nécessaires :
+
+* aux commandes ;
+* aux livraisons ;
+* aux encaissements ;
+* aux statistiques ;
+* aux audits.
+
+Lorsque la conservation historique est nécessaire, l'archivage ou la désactivation doit être privilégié.
+
+---
+
+# 33. AFFECTATION DES LIVREURS
+
+L'administration doit pouvoir :
+
+* affecter un livreur ;
+* réaffecter un livreur ;
+* consulter le livreur affecté ;
+* conserver la trace de l'affectation.
+
+L'identifiant du livreur affecté doit être conservé de manière cohérente.
+
+---
+
+# 34. GPS DU LIVREUR — RÈGLE DÉFINITIVE #12
+
+Pendant l'état :
+
+`delivering`
+
+la position du livreur est transmise **toutes les 10 secondes**.
+
+Aucune position fictive ne doit être générée lorsque la transmission est interrompue.
+
+---
+
+# 35. HISTORIQUE GPS — RÈGLE DÉFINITIVE #13
+
+L'historique des positions GPS est conservé pendant **72 heures**.
+
+Les données doivent être protégées contre les accès non autorisés.
+
+À expiration de la durée de conservation, elles doivent être supprimées ou anonymisées conformément à la politique applicable.
+
+---
+
+# 36. RÉCLAMATIONS
+
+Le système doit permettre la gestion des réclamations avec les statuts :
+
+`OPEN`
+
+`IN_REVIEW`
+
+`RESOLVED`
+
+`CLOSED`
+
+La casse est obligatoire.
+
+---
+
+# 37. CRÉATION D'UNE RÉCLAMATION — RÈGLE DÉFINITIVE #15
+
+Une réclamation peut être créée jusqu'à **3 heures après la confirmation de la livraison**.
+
+Le serveur constitue la référence temporelle.
+
+Toute tentative hors délai doit être refusée.
+
+---
+
+# 38. NOMBRE DE RÉCLAMATIONS — RÈGLE DÉFINITIVE #16
+
+Une commande peut avoir **une seule réclamation**.
+
+Une deuxième création doit être refusée.
+
+Le contrôle doit être effectué côté serveur et doit résister aux créations concurrentes.
+
+---
+
+# 39. CHAT
+
+Le chat est exclusivement associé à une réclamation.
+
+Il ne doit pas exister de chat général indépendant des réclamations.
+
+Aucun bouton de chat général ne doit être ajouté.
+
+---
+
+# 40. PHOTOS DE RÉCLAMATION
+
+Une réclamation peut permettre l'ajout de photographies lorsque cette fonction est autorisée.
+
+Les fichiers doivent être contrôlés, sécurisés et associés à la réclamation correspondante.
+
+---
+
+# 41. NOTIFICATIONS
+
+Le système doit définir une matrice de notification précisant :
+
+* événement ;
+* destinataire ;
+* canal ;
+* contenu ;
+* préférence utilisateur ;
+* statut d'envoi ;
+* échec ;
+* nouvelle tentative lorsque applicable.
+
+---
+
+# 42. PROMOTIONS — RÈGLE DÉFINITIVE #11
+
+Lorsque plusieurs promotions/avantages sont applicables et autorisés au cumul, ils sont appliqués dans l'ordre suivant :
+
+**la promotion la plus récente en premier, puis celle qui la précède, puis la suivante, etc.**
+
+L'ordre doit être déterministe.
+
+Les promotions non applicables ou exclues par leurs conditions ne sont pas appliquées.
+
+Le résultat du calcul doit être conservé dans la commande.
+
+---
+
+# 43. ANNULATION
+
+Les règles d'annulation doivent distinguer les différents états de la commande.
+
+Une annulation ne doit pas provoquer de double restitution ou d'opération incohérente sur le stock.
+
+---
+
+# 44. REMPLACEMENT DE PRODUIT
+
+Si une rupture intervient après commande, le système doit gérer explicitement les règles de remplacement ou d'indisponibilité prévues.
+
+Aucune substitution silencieuse ne doit être effectuée.
+
+---
+
+# 45. CAPACITÉ DE PRODUCTION
+
+Le système doit pouvoir prendre en compte les contraintes de capacité de la cuisine lorsqu'elles sont définies.
+
+---
+
+# 46. CRÉNEAUX DE LIVRAISON
+
+Le système doit pouvoir gérer les créneaux de livraison lorsqu'ils sont activés.
+
+---
+
+# 47. ADRESSES
+
+L'adresse de livraison doit être suffisamment complète pour permettre la livraison.
+
+Le système doit gérer les cas d'adresse non géocodable ou ambiguë.
+
+---
+
+# 48. GOOGLE MAPS / GPS
+
+L'intégration cartographique doit prévoir :
+
+* géocodage ;
+* affichage de la position ;
+* itinéraire ;
+* ETA ;
+* recalcul ;
+* erreurs de service ;
+* quotas ;
+* configuration sécurisée.
+
+---
+
+# 49. PREUVE DE LIVRAISON
+
+Le système doit permettre la définition et la conservation d'une preuve de livraison conformément aux règles métier retenues.
+
+---
+
+# 50. CONFIRMATION DE LIVRAISON
+
+La confirmation de livraison doit être distincte de la confirmation d'encaissement.
+
+---
+
+# 51. COMMUNICATION CLIENT-LIVREUR
+
+Les mécanismes autorisés de communication doivent être définis sans créer de chat général hors réclamation.
+
+---
+
+# 52. UTILISATEURS
+
+L'administration doit pouvoir gérer les comptes et les droits selon la matrice de permissions.
+
+---
+
+# 53. PERMISSIONS
+
+Les permissions doivent être suffisamment granulaires pour distinguer :
+
+* lecture ;
+* lecture seule ;
+* création ;
+* modification ;
+* suppression ;
+* activation ;
+* désactivation ;
+* réactivation ;
+* affectation ;
+* réaffectation ;
+* validation.
+
+---
+
+# 54. MATRICE READ ONLY
+
+Le droit `READ ONLY` constitue une véritable permission.
+
+Il ne doit pas être traité comme une simple restriction visuelle.
+
+Une API ou une requête directe ne doit pas permettre de contourner cette restriction.
+
+---
+
+# 55. SÉCURITÉ
+
+Le système doit prévoir notamment :
+
+* authentification ;
+* autorisation ;
+* protection des sessions ;
+* expiration ;
+* déconnexion globale ;
+* protection contre les attaques par force brute ;
+* validation des entrées ;
+* protection XSS ;
+* protection contre les injections ;
+* CORS ;
+* CSRF lorsque pertinent ;
+* contrôle des uploads ;
+* protection des secrets ;
+* limitation de débit ;
+* journalisation des opérations sensibles.
+
+---
+
+# 56. MOTS DE PASSE
+
+Les mots de passe doivent être stockés de manière sécurisée.
+
+Les mécanismes de réinitialisation doivent être sécurisés.
+
+Les comptes administratifs doivent bénéficier d'une protection renforcée.
+
+---
+
+# 57. API
+
+L'API doit disposer d'un contrat clair concernant :
+
+* entrées ;
+* sorties ;
+* erreurs ;
+* authentification ;
+* permissions ;
+* pagination ;
+* filtres ;
+* tri ;
+* limites ;
+* idempotence ;
+* versionnement lorsque nécessaire.
+
+---
+
+# 58. TRANSACTIONS ET IDEMPOTENCE
+
+Les opérations critiques doivent être protégées contre :
+
+* double clic ;
+* double requête ;
+* reprise réseau ;
+* concurrence ;
+* répétition d'une opération.
+
+---
+
+# 59. JOURNAL D'AUDIT
+
+Les opérations sensibles doivent être journalisées.
+
+Le journal doit permettre d'identifier notamment :
+
+* utilisateur ;
+* action ;
+* date/heure ;
+* objet concerné ;
+* ancienne valeur lorsque nécessaire ;
+* nouvelle valeur lorsque nécessaire ;
+* résultat.
+
+---
+
+# 60. AUDIT DES CONFIGURATIONS
+
+Les changements de configuration importants doivent être traçables.
+
+---
+
+# 61. ACTIONS IRRÉVERSIBLES
+
+Les actions irréversibles du Super Admin doivent être identifiées et protégées par des contrôles adaptés.
+
+---
+
+# 62. RECHERCHE ADMINISTRATIVE
+
+L'administration doit disposer d'une recherche globale adaptée aux besoins de supervision :
+
+* commande ;
+* client ;
+* téléphone ;
+* livreur ;
+* produit ;
+* etc., selon les permissions.
+
+---
+
+# 63. HISTORIQUE DES COMMANDES
+
+Le système doit conserver la chronologie des événements importants d'une commande.
+
+---
+
+# 64. MACHINE D'ÉTAT OFFICIELLE
+
+La machine d'état des commandes constitue la référence unique.
+
+Aucune transition non autorisée ne doit être acceptée.
+
+Les combinaisons d'états incohérentes doivent être rejetées.
+
+---
+
+# 65. MONNAIE ET PRÉCISION
+
+Les montants monétaires doivent utiliser une représentation précise et déterministe.
+
+La devise doit être explicitement définie.
+
+---
+
+# 66. DÉCOMPOSITION DU TOTAL
+
+Le total doit permettre de distinguer autant que nécessaire :
+
+* produits ;
+* personnalisations ;
+* suppléments ;
+* livraison ;
+* promotions ;
+* autres ajustements autorisés ;
+* total final.
+
+---
+
+# 67. FRAIS DE LIVRAISON
+
+Les frais de livraison doivent être gérés séparément du prix des produits.
+
+Le calcul doit respecter les règles de zones et de configuration retenues.
+
+---
+
+# 68. ENCAISSEMENT ET RAPPROCHEMENT
+
+Le système doit permettre :
+
+* montant attendu ;
+* montant reçu ;
+* différence ;
+* reste à encaisser ;
+* correction ;
+* historique ;
+* rapprochement.
+
+---
+
+# 69. CAISSE
+
+Les règles de clôture de caisse doivent permettre un rapprochement entre :
+
+* commandes ;
+* montants attendus ;
+* montants encaissés ;
+* écarts.
+
+---
+
+# 70. REMBOURSEMENT / CORRECTION
+
+Les opérations financières exceptionnelles doivent être autorisées, tracées et protégées.
+
+---
+
+# 71. FISCALITÉ
+
+Les règles fiscales applicables doivent être paramétrables selon les obligations légales et le contexte d'exploitation.
+
+Aucune valeur fiscale non décidée ne doit être inventée.
+
+---
+
+# 72. FACTURE / JUSTIFICATIF
+
+Le système doit permettre de produire le justificatif correspondant à la commande selon les règles fiscales et commerciales applicables.
+
+---
+
+# 73. TRAÇABILITÉ DES LOTS
+
+Le système doit pouvoir assurer la traçabilité :
+
+**lot → ingrédient → recette → produit → commande**
+
+lorsque cette traçabilité est requise.
+
+---
+
+# 74. RAPPEL DE LOT
+
+Le système doit permettre d'identifier les commandes concernées lorsqu'un lot doit être rappelé.
+
+---
+
+# 75. INVENTAIRE
+
+Les inventaires physiques doivent être gérés avec conservation des écarts et de leur justification.
+
+---
+
+# 76. GASPILLAGE
+
+Les pertes et gaspillages doivent être distingués des consommations normales lorsque nécessaire.
+
+---
+
+# 77. FOURNISSEURS ET RÉCEPTIONS
+
+Les commandes fournisseurs, réceptions, quantités et prix d'achat doivent être traçables.
+
+---
+
+# 78. LOTS ET EXPIRATION
+
+Les lots et dates d'expiration doivent être gérés lorsque nécessaires au fonctionnement métier.
+
+---
+
+# 79. DISPONIBILITÉ DES PRODUITS
+
+Un produit indisponible ne doit pas pouvoir être commandé lorsque les règles métier l'interdisent.
+
+---
+
+# 80. QUANTITÉS MAXIMALES
+
+Les limites quantitatives configurées doivent être respectées.
+
+---
+
+# 81. MODIFICATION D'UNE COMMANDE
+
+Les modifications sont autorisées uniquement dans les états et conditions prévus.
+
+Une modification après le début de préparation doit être traitée selon les règles métier correspondantes.
+
+---
+
+# 82. DUPLICATION / RECOMMANDE
+
+Le système peut permettre la duplication d'une commande selon les règles définies, sans contourner les contrôles actuels de disponibilité et de prix.
+
+---
+
+# 83. ABANDON DE PANIER
+
+Le système doit gérer les paniers abandonnés selon la politique retenue.
+
+---
+
+# 84. COMMANDES SIMULTANÉES
+
+Un client peut avoir plusieurs commandes simultanées lorsque les règles métier l'autorisent.
+
+Chaque commande reste indépendante.
+
+---
+
+# 85. IDEMPOTENCE GLOBALE
+
+La création et les opérations critiques de commande doivent être protégées contre les doublons.
+
+---
+
+# 86. RÉFÉRENCES DE CORRÉLATION
+
+Les opérations importantes doivent pouvoir être reliées entre elles par des références de corrélation adaptées.
+
+---
+
+# 87. ARCHIVAGE
+
+Les données historiques doivent respecter une politique d'archivage.
+
+---
+
+# 88. VERROUILLAGE DE L'HISTORIQUE
+
+Les données historiques nécessitant une intégrité particulière ne doivent pas être librement modifiables.
+
+---
+
+# 89. SUPPRESSION ET ANONYMISATION
+
+Les règles de suppression physique, conservation et anonymisation doivent être définies sans détruire les éléments nécessaires à la traçabilité légitime.
+
+---
+
+# 90. DONNÉES PERSONNELLES
+
+Le système doit prévoir les règles relatives :
+
+* à la conservation ;
+* à l'accès ;
+* à l'export ;
+* à la suppression ;
+* à l'anonymisation ;
+* au consentement lorsque nécessaire.
+
+---
+
+# 91. EXPORT DES DONNÉES
+
+Les exports doivent être contrôlés par permissions et tracés lorsque nécessaire.
+
+---
+
+# 92. IMPORT
+
+Les imports doivent être :
+
+* validés ;
+* contrôlés ;
+* traçables ;
+* réversibles lorsque prévu.
+
+---
+
+# 93. MIGRATION
+
+Toute migration doit prévoir :
+
+* validation ;
+* sauvegarde ;
+* contrôle ;
+* possibilité de rollback lorsque nécessaire.
+
+---
+
+# 94. SAUVEGARDE
+
+Les sauvegardes doivent avoir une fréquence définie et être testées.
+
+---
+
+# 95. RESTAURATION
+
+Une procédure de restauration doit exister et être testée.
+
+---
+
+# 96. RPO / RTO
+
+Les objectifs de récupération doivent être définis.
+
+---
+
+# 97. ENVIRONNEMENTS
+
+Les environnements de développement, test et production doivent être séparés lorsque nécessaire.
+
+---
+
+# 98. DÉPLOIEMENT
+
+La procédure de déploiement doit être documentée.
+
+---
+
+# 99. ROLLBACK
+
+Une procédure de retour à une version précédente doit être disponible.
+
+---
+
+# 100. VERSIONNEMENT
+
+L'application doit identifier sa version.
+
+---
+
+# 101. COMPATIBILITÉ FRONTEND / BACKEND
+
+Les versions frontend et backend incompatibles doivent être détectées ou empêchées.
+
+---
+
+# 102. MONITORING
+
+Le système doit disposer d'un suivi de santé permettant d'identifier les erreurs importantes.
+
+---
+
+# 103. ALERTES
+
+Les événements critiques doivent pouvoir générer des alertes.
+
+---
+
+# 104. CORRÉLATION TECHNIQUE
+
+Les erreurs doivent pouvoir être reliées à leur contexte d'exécution par des identifiants de corrélation.
+
+---
+
+# 105. ÉTATS RÉSEAU
+
+L'application doit gérer :
+
+* chargement ;
+* perte de connexion ;
+* reconnexion ;
+* erreur ;
+* reprise.
+
+---
+
+# 106. OFFLINE LIVREUR
+
+Le comportement du livreur en cas de perte réseau doit être défini.
+
+Aucune information non confirmée par le serveur ne doit être présentée comme définitivement enregistrée.
+
+---
+
+# 107. PWA
+
+Les fonctionnalités PWA doivent être définies selon les besoins réels.
+
+---
+
+# 108. RESPONSIVE
+
+L'interface doit fonctionner sur les formats d'écran nécessaires.
+
+---
+
+# 109. ACCESSIBILITÉ
+
+Les interfaces doivent respecter les exigences d'accessibilité applicables.
+
+---
+
+# 110. NAVIGATEURS
+
+Les navigateurs officiellement supportés doivent être identifiés.
+
+---
+
+# 111. LANGUES
+
+Les langues prises en charge doivent être définies et cohérentes dans l'ensemble de l'application.
+
+---
+
+# 112. PERFORMANCE
+
+Les temps de réponse attendus doivent être définis.
+
+---
+
+# 113. CHARGE
+
+Le système doit être testé avec une charge représentative.
+
+---
+
+# 114. ERREURS DES SERVICES EXTERNES
+
+Le système doit gérer les indisponibilités :
+
+* Google Maps ;
+* SMS ;
+* e-mail ;
+* stockage de photos ;
+* autres dépendances externes.
+
+---
+
+# 115. CONFIGURATION DES SERVICES EXTERNES
+
+Les clés et secrets ne doivent pas être exposés inutilement.
+
+---
+
+# 116. LIMITATION DE DÉBIT
+
+Les points sensibles doivent être protégés contre les abus et attaques répétitives.
+
+---
+
+# 117. NOTIFICATIONS ÉCHOUÉES
+
+Les échecs de notification doivent être enregistrés et traités selon les règles de retry.
+
+---
+
+# 118. MOT DE PASSE OUBLIÉ
+
+Une procédure sécurisée de récupération doit être prévue.
+
+---
+
+# 119. SESSIONS
+
+Le système doit gérer :
+
+* expiration ;
+* renouvellement ;
+* sessions multiples ;
+* déconnexion globale.
+
+---
+
+# 120. PROTECTION DES COMPTES
+
+Les comptes sensibles doivent disposer de protections renforcées.
+
+---
+
+# 121. UPLOADS
+
+Les fichiers uploadés doivent être contrôlés :
+
+* type ;
+* taille ;
+* contenu ;
+* stockage ;
+* accès.
+
+---
+
+# 122. DONNÉES DE CONNEXION
+
+Les secrets, tokens et informations sensibles doivent être protégés.
+
+---
+
+# 123. ÉTATS DE CHARGEMENT
+
+Chaque action asynchrone doit disposer d'un état de chargement approprié.
+
+---
+
+# 124. ERREURS UTILISATEUR
+
+Les erreurs doivent être compréhensibles et ne doivent pas exposer de données sensibles.
+
+---
+
+# 125. CONFIRMATIONS
+
+Les actions destructrices ou sensibles doivent demander une confirmation adaptée.
+
+---
+
+# 126. JOURNAL TECHNIQUE
+
+Les erreurs techniques importantes doivent être journalisées.
+
+---
+
+# 127. RÈGLES DE RÉCLAMATION
+
+Les motifs, traitements, résolutions et autorisations de remboursement doivent être définis.
+
+---
+
+# 128. NOTIFICATIONS CLIENT
+
+Le client doit pouvoir recevoir les notifications liées aux événements importants de sa commande et de sa réclamation selon la matrice définie.
+
+---
+
+# 129. PRÉFÉRENCES DE NOTIFICATION
+
+Les préférences utilisateur doivent être respectées lorsque le canal concerné peut être désactivé.
+
+---
+
+# 130. GPS ET CONFIDENTIALITÉ
+
+La collecte GPS doit être limitée au besoin opérationnel défini.
+
+La durée de conservation est fixée à **72 heures**.
+
+---
+
+# 131. HISTORIQUE GPS
+
+L'historique doit pouvoir être relié à la livraison concernée et au livreur concerné selon les permissions.
+
+---
+
+# 132. POSITION AFFICHÉE
+
+La position affichée au client ou à l'administration doit respecter les droits d'accès.
+
+---
+
+# 133. FIN DU SUIVI GPS
+
+Le suivi GPS doit cesser lorsque les conditions métier de suivi ne sont plus réunies.
+
+---
+
+# 134. RÈGLE DE CHAT
+
+Le chat existe **uniquement à l'intérieur d'une réclamation**.
+
+Il n'existe pas de chat général.
+
+---
+
+# 135. PIÈCES JOINTES DES RÉCLAMATIONS
+
+Les pièces jointes autorisées doivent être sécurisées et liées à la réclamation.
+
+---
+
+# 136. RÉOUVERTURE
+
+La possibilité de réouverture d'une réclamation doit respecter le cycle de vie défini et ne crée pas une deuxième réclamation.
+
+---
+
+# 137. DÉLAI DE RÉCLAMATION
+
+Le délai est définitivement fixé à :
+
+**3 heures après confirmation de livraison.**
+
+---
+
+# 138. UNE RÉCLAMATION PAR COMMANDE
+
+Une commande ne peut posséder qu'une seule réclamation.
+
+---
+
+# 139. STATUTS DES RÉCLAMATIONS
+
+Les statuts sont :
+
+`OPEN`
+
+`IN_REVIEW`
+
+`RESOLVED`
+
+`CLOSED`
+
+---
+
+# 140. MATRICE DES NOTIFICATIONS
+
+Une matrice centralisée doit définir les événements, destinataires, canaux, contenus, erreurs et reprises.
+
+---
+
+# 141. RÔLES ET AUTORISATIONS
+
+Chaque opération sensible doit être protégée par une autorisation explicite.
+
+---
+
+# 142. READ ONLY — PRINCIPE GLOBAL
+
+Le mode lecture seule ne doit jamais être contournable par une requête directe.
+
+---
+
+# 143. GESTION DES LIVREURS — SYNTHÈSE
+
+Les opérations suivantes doivent être explicitement prises en charge selon les permissions :
+
+* ajout ;
+* modification ;
+* activation ;
+* désactivation ;
+* réactivation ;
+* suppression/archivage ;
+* gestion des accès ;
+* affectation ;
+* réaffectation ;
+* consultation de l'activité.
+
+---
+
+# 144. ADMINISTRATION DES COMPTES
+
+L'administration doit pouvoir gérer les comptes selon les permissions prévues.
+
+---
+
+# 145. BLOCAGE CLIENT
+
+La possibilité de bloquer un client doit être gérée selon les règles métier et les permissions.
+
+---
+
+# 146. EXPORT CLIENT
+
+Le client doit pouvoir exercer les droits d'export prévus par la politique de données.
+
+---
+
+# 147. CONSENTEMENT
+
+Les consentements nécessaires doivent être gérés et tracés.
+
+---
+
+# 148. HORAIRES
+
+Les horaires d'activité doivent pouvoir être configurés.
+
+---
+
+# 149. FERMETURES EXCEPTIONNELLES
+
+Les jours de fermeture exceptionnels doivent pouvoir être configurés.
+
+---
+
+# 150. ZONES DE LIVRAISON
+
+Les zones de livraison doivent être configurables.
+
+---
+
+# 151. COMMANDE MINIMALE
+
+Une commande minimale peut être configurée si la règle métier l'exige.
+
+---
+
+# 152. DÉLAIS
+
+Les délais de préparation et de livraison doivent être représentés selon les règles configurées.
+
+---
+
+# 153. PRIORITÉS
+
+Les règles de priorité des commandes doivent être définies.
+
+---
+
+# 154. TEMPS DE PRÉPARATION
+
+Le temps de préparation doit pouvoir être associé aux produits ou commandes selon les besoins.
+
+---
+
+# 155. QUEUE KDS
+
+La cuisine doit disposer d'une file de production claire.
+
+---
+
+# 156. RUPTURE PENDANT PRÉPARATION
+
+Une rupture d'ingrédient pendant la préparation doit être gérée explicitement.
+
+---
+
+# 157. REFUS LIVREUR
+
+Le refus d'une livraison par un livreur doit être géré et tracé.
+
+---
+
+# 158. ÉCHEC DE LIVRAISON
+
+Un échec de livraison doit disposer d'un motif et d'un traitement.
+
+---
+
+# 159. DEUXIÈME TENTATIVE
+
+Une seconde tentative de livraison doit être gérée selon les règles métier.
+
+---
+
+# 160. DISPONIBILITÉ LIVREUR
+
+La disponibilité des livreurs doit être identifiable.
+
+---
+
+# 161. FLOTTE
+
+La gestion de la flotte doit permettre la gestion des véhicules et informations associées selon les permissions.
+
+---
+
+# 162. GPS — FRÉQUENCE
+
+**10 secondes pendant `delivering`.**
+
+---
+
+# 163. GPS — RÉTENTION
+
+**72 heures.**
+
+---
+
+# 164. GPS — CONFIDENTIALITÉ
+
+Les données GPS doivent être accessibles uniquement aux rôles autorisés.
+
+---
+
+# 165. PREUVE DE LIVRAISON
+
+La preuve doit être enregistrée selon le mécanisme retenu.
+
+---
+
+# 166. CODE DE CONFIRMATION
+
+Un code de confirmation de livraison peut être utilisé conformément aux règles métier définies.
+
+---
+
+# 167. REFUS DE LIVRAISON PAR LE CLIENT
+
+Le refus doit être enregistré avec son motif et son traitement.
+
+---
+
+# 168. RETOUR DE COMMANDE
+
+Les règles concernant le retour d'une commande non livrée doivent être explicites.
+
+---
+
+# 169. PRODUITS ALIMENTAIRES
+
+Les règles de sécurité et de traçabilité propres aux produits alimentaires doivent être prises en compte.
+
+---
+
+# 170. ALLERGÈNES
+
+Les informations allergènes doivent être présentées lorsqu'elles sont disponibles et obligatoires.
+
+---
+
+# 171. NUTRITION
+
+Les informations nutritionnelles doivent être gérées lorsque définies.
+
+---
+
+# 172. PORTIONS
+
+Les portions et unités culinaires doivent être déterministes.
+
+---
+
+# 173. VERSIONNEMENT DES RECETTES
+
+Les recettes doivent pouvoir être versionnées lorsque leur modification impacte l'historique.
+
+---
+
+# 174. MARGE
+
+Le système peut calculer les marges à partir des coûts et prix applicables.
+
+---
+
+# 175. PRIX
+
+Les prix doivent être versionnés lorsque nécessaire afin de préserver l'historique des commandes.
+
+---
+
+# 176. PROMOTIONS
+
+Les promotions doivent respecter leurs conditions d'application.
+
+---
+
+# 177. ORDRE DES PROMOTIONS
+
+L'ordre de cumul est définitivement :
+
+**plus récente → précédente → précédente, etc.**
+
+---
+
+# 178. EXCLUSIONS PROMOTIONNELLES
+
+Les promotions incompatibles ou exclues ne doivent pas être appliquées.
+
+---
+
+# 179. PRECISION FINANCIÈRE
+
+Les calculs financiers doivent éviter les erreurs d'arrondi non maîtrisées.
+
+---
+
+# 180. DEVISE
+
+La devise de l'application doit être définie de manière globale et cohérente.
+
+---
+
+# 181. RAPPROCHEMENT FINANCIER
+
+Les données de commande et d'encaissement doivent pouvoir être rapprochées.
+
+---
+
+# 182. CLÔTURE DE CAISSE
+
+Une clôture de caisse doit pouvoir être effectuée selon les règles d'exploitation.
+
+---
+
+# 183. ÉCART D'ENCAISSEMENT
+
+Tout écart doit être identifiable et traçable.
+
+---
+
+# 184. RETOUR FINANCIER
+
+Les corrections financières doivent être autorisées et journalisées.
+
+---
+
+# 185. DÉTECTION DE DOUBLONS
+
+Les commandes, paiements, opérations de stock et autres opérations sensibles doivent disposer de mécanismes de détection de doublons.
+
+---
+
+# 186. CORRÉLATION DES OPÉRATIONS
+
+Les opérations métier et techniques doivent pouvoir être reliées par des références cohérentes.
+
+---
+
+# 187. ÉTATS INCOHÉRENTS
+
+Le système doit empêcher les combinaisons d'états incompatibles.
+
+---
+
+# 188. MACHINE D'ÉTAT — RÉFÉRENCE FINALE
+
+La machine d'état officielle est celle définie au §14 et constitue l'unique référence.
+
+---
+
+# 189. AUDIT DES CONFIGURATIONS
+
+Toute modification sensible de configuration doit être enregistrée.
+
+---
+
+# 190. MAINTENANCE
+
+Le système doit pouvoir entrer en mode maintenance lorsque nécessaire.
+
+---
+
+# 191. VERSION APPLICATION
+
+La version de l'application doit être identifiable.
+
+---
+
+# 192. COMPATIBILITÉ
+
+Frontend et backend doivent être compatibles.
+
+---
+
+# 193. GESTION GLOBALE DES ERREURS
+
+Les erreurs métier, techniques, réseau et externes doivent disposer d'un traitement cohérent.
+
+---
+
+# 194. ÉTATS RÉSEAU GLOBAUX
+
+L'application doit gérer correctement les pertes réseau et les reprises.
+
+---
+
+# 195. INSTALLATION
+
+La procédure d'installation doit être documentée.
+
+---
+
+# 196. CONFIGURATION
+
+La configuration doit être documentée et séparée des secrets.
+
+---
+
+# 197. BASE DE DONNÉES
+
+Le schéma définitif doit être documenté.
+
+---
+
+# 198. RELATIONS
+
+Les relations entre entités doivent être explicites.
+
+---
+
+# 199. IDENTIFIANTS
+
+Les identifiants doivent être uniques et adaptés aux besoins de traçabilité.
+
+---
+
+# 200. API CONTRACT
+
+Les contrats API doivent être documentés.
+
+---
+
+# 201. PAGINATION
+
+Les listes importantes doivent supporter la pagination lorsque nécessaire.
+
+---
+
+# 202. TRI
+
+Les listes doivent pouvoir être triées selon les besoins.
+
+---
+
+# 203. FILTRES
+
+Les listes doivent pouvoir être filtrées.
+
+---
+
+# 204. LIMITES
+
+Les API doivent disposer de limites appropriées.
+
+---
+
+# 205. TEMPS RÉEL
+
+L'architecture temps réel doit être définie lorsque nécessaire.
+
+---
+
+# 206. CONFLITS
+
+Les conflits de mise à jour doivent être détectés et traités.
+
+---
+
+# 207. IMPORT INITIAL
+
+Les données initiales importées doivent être validées.
+
+---
+
+# 208. DONNÉES INITIALES
+
+Les données nécessaires au démarrage doivent être documentées.
+
+---
+
+# 209. ROLLBACK MIGRATION
+
+Une migration doit pouvoir être contrôlée et annulée selon les procédures prévues.
+
+---
+
+# 210. HEALTH CHECK
+
+L'application doit exposer un mécanisme de vérification de santé.
+
+---
+
+# 211. ALERTES TECHNIQUES
+
+Les événements techniques critiques doivent générer des alertes appropriées.
+
+---
+
+# 212. LOGS
+
+Les logs doivent être accessibles aux personnes autorisées et protégés.
+
+---
+
+# 213. INSTALLATION ET DÉPLOIEMENT
+
+Les étapes d'installation et de déploiement doivent être reproductibles.
+
+---
+
+# 214. SAUVEGARDE ET RESTAURATION
+
+Les procédures doivent être documentées et testées.
+
+---
+
+# 215. EXPLOITATION
+
+Les opérations courantes doivent disposer d'une documentation.
+
+---
+
+# 216. DÉPANNAGE
+
+Une documentation de troubleshooting doit couvrir les problèmes connus.
+
+---
+
+# 217. TESTS
+
+Le système doit être testé fonctionnellement, techniquement et au niveau des autorisations.
+
+---
+
+# 218. TESTS DE RÔLES
+
+Chaque rôle doit être testé avec :
+
+* opérations autorisées ;
+* opérations interdites ;
+* accès directs ;
+* accès API.
+
+---
+
+# 219. TEST READ ONLY
+
+Un utilisateur READ ONLY doit être testé sur :
+
+* consultation autorisée ;
+* tentative d'ajout ;
+* tentative de modification ;
+* tentative de suppression ;
+* tentative de modification via API.
+
+Toutes les opérations interdites doivent être refusées.
+
+---
+
+# 220. TEST LIVREUR
+
+La gestion des livreurs doit être testée pour :
+
+* ajout ;
+* modification ;
+* activation ;
+* désactivation ;
+* réactivation ;
+* suppression/archivage ;
+* affectation ;
+* réaffectation ;
+* conservation de l'historique.
+
+---
+
+# 221. TEST COMMANDER / PERSONNALISER
+
+Le parcours doit être testé dans les deux cas :
+
+### Parcours A
+
+**Menu → Personnaliser → personnalisation → panier**
+
+### Parcours B
+
+**Menu → Commander → fenêtre de commande → personnalisation éventuelle → confirmation**
+
+Les deux parcours doivent produire une commande cohérente.
+
+---
+
+# 222. TEST STOCK
+
+Le passage :
+
+`received → preparing`
+
+doit déclencher une seule consommation de stock.
+
+Une répétition de requête ne doit pas provoquer une seconde consommation.
+
+---
+
+# 223. TEST GPS
+
+Pendant `delivering`, la transmission doit respecter la fréquence de **10 secondes**.
+
+L'historique doit être conservé selon la durée de **72 heures**.
+
+---
+
+# 224. TEST RÉCLAMATION
+
+Tester :
+
+* création dans les 3 heures ;
+* création après 3 heures ;
+* deuxième réclamation sur la même commande ;
+* concurrence de deux créations.
+
+Une seule réclamation doit être acceptée.
+
+---
+
+# 225. TEST PROMOTIONS
+
+Tester plusieurs promotions applicables et vérifier que l'ordre est :
+
+**plus récente → précédente → précédente.**
+
+---
+
+# 226. TESTS DE NON-RÉGRESSION
+
+Toute correction doit être suivie de tests permettant de vérifier que les fonctions existantes ne sont pas cassées.
+
+---
+
+# 227. CRITÈRES D'ACCEPTATION
+
+Une fonctionnalité n'est considérée comme conforme que si :
+
+* elle fonctionne ;
+* les permissions sont correctes ;
+* le backend applique les restrictions ;
+* les données sont cohérentes ;
+* les erreurs sont gérées ;
+* la traçabilité est assurée lorsque nécessaire ;
+* les tests correspondants sont réussis.
+
+---
+
+# 228. PREUVE DE CONFORMITÉ
+
+Une affirmation de conformité doit être accompagnée de preuves adaptées :
+
+* test ;
+* résultat ;
+* fichier ;
+* configuration ;
+* journal ;
+* capture lorsque pertinente ;
+* vérification API lorsque nécessaire.
+
+---
+
+# 229. ABSENCE DE SUPPOSITION
+
+Une règle non explicitement décidée ne doit pas être transformée en règle métier définitive sans validation.
+
+---
+
+# 230. EXEMPLES VS RÈGLES
+
+Une valeur présentée comme exemple dans les anciens documents ne doit pas être considérée comme une règle définitive si elle n'a pas été explicitement validée.
+
+Les six clarifications du présent document sont, elles, définitives.
+
+---
+
+# 231. GESTION DES CONTRADICTIONS
+
+Lorsqu'une ancienne formulation contredit une règle définitivement décidée dans ce document, la règle du présent document prévaut.
+
+---
+
+# 232. CONSERVATION DE L'HISTORIQUE
+
+Les données nécessaires à la traçabilité ne doivent pas être détruites par une opération administrative ordinaire.
+
+---
+
+# 233. SUPPRESSION PHYSIQUE
+
+Toute suppression physique doit respecter les obligations de conservation applicables.
+
+---
+
+# 234. ACTIONS IRRÉVERSIBLES
+
+Les actions irréversibles doivent être clairement identifiées et protégées.
+
+---
+
+# 235. MAINTENANCE ET VERSIONNEMENT
+
+Les versions de l'application et les changements importants doivent être traçables.
+
+---
+
+# 236. MATRICE DE TRAÇABILITÉ
+
+Le projet doit disposer d'une matrice finale permettant de relier :
+
+**exigence → fonctionnalité → implémentation → test → preuve**
+
+---
+
+# 237. DOCUMENTATION
+
+La documentation doit couvrir :
+
+* fonctionnement ;
+* installation ;
+* configuration ;
+* administration ;
+* exploitation ;
+* dépannage ;
+* sauvegarde ;
+* restauration ;
+* sécurité.
+
+---
+
+# 238. LIVRABLES
+
+Les livrables doivent comprendre notamment :
+
+* application ;
+* backend ;
+* base de données ;
+* documentation ;
+* configuration ;
+* tests ;
+* procédures ;
+* matrice de traçabilité.
+
+---
+
+# 239. ACCEPTATION FINALE
+
+L'acceptation finale doit être effectuée sur la base du présent cahier et des preuves correspondantes.
+
+---
+
+# 240. ORDRE DE CONSTRUCTION
+
+Le développement doit être réalisé par blocs cohérents et vérifiables.
+
+Aucune correction ne doit masquer une régression d'une autre fonctionnalité.
+
+---
+
+# 241. VALIDATION
+
+Chaque bloc doit être validé avant de considérer le bloc suivant comme conforme.
+
+---
+
+# 242. RÈGLE DE RÉFÉRENCE DES CLARIFICATIONS
+
+Les six clarifications suivantes sont définitivement intégrées :
+
+* **#10** : consommation du stock au clic **« En préparation »** ;
+* **#11** : promotions de la plus récente à la plus ancienne ;
+* **#12** : GPS toutes les 10 secondes ;
+* **#13** : historique GPS 72 heures ;
+* **#15** : réclamation dans les 3 heures après confirmation de livraison ;
+* **#16** : une seule réclamation par commande.
+
+---
+
+# 243. RÈGLE DE RÉFÉRENCE DES CORRECTIONS
+
+Les corrections suivantes sont définitivement intégrées :
+
+* ingrédients en `READ ONLY` ;
+* gestion complète des livreurs ;
+* distinction désactivation/suppression ;
+* permissions granulaires ;
+* boutons **Commander** et **Personnaliser** ;
+* personnalisation possible après clic sur **Commander** et avant confirmation.
+
+---
+
+# 244. RÈGLE DE NON-DÉFORMATION
+
+Le développement doit respecter les exigences telles qu'elles sont écrites.
+
+Une fonctionnalité ne doit pas être remplacée par une interprétation simplifiée qui en supprimerait une partie.
+
+---
+
+# 245. RÈGLE DE COMPLÉTUDE
+
+Le présent document constitue la consolidation des exigences retenues.
+
+Aucune section précédemment consolidée ne doit être volontairement supprimée lors d'une révision ultérieure.
+
+Toute nouvelle modification doit être ajoutée ou remplacer explicitement une règle identifiée.
+
+---
+
+# 246. RÈGLE DE MODIFICATION FUTURE
+
+Une décision future peut modifier une règle du présent document uniquement si elle est explicitement identifiée comme une nouvelle décision.
+
+La nouvelle version doit alors conserver la traçabilité de la modification.
+
+---
+
+# 247. RÉFÉRENCE DES STATUTS
+
+### Commandes
+
+`received`
+
+`preparing`
+
+`ready`
+
+`waiting_for_driver`
+
+`delivering`
+
+`delivered`
+
+`cancelled`
+
+### Réclamations
+
+`OPEN`
+
+`IN_REVIEW`
+
+`RESOLVED`
+
+`CLOSED`
+
+Ces conventions de casse sont obligatoires.
+
+---
+
+# 248. CLARIFICATIONS FINALES — ÉTAT
+
+Les six points autrefois ouverts sont maintenant **définitivement résolus**.
+
+| Point   | Décision                                                       |
+| ------- | -------------------------------------------------------------- |
+| **#10** | Stock consommé au clic **« En préparation »**                  |
+| **#11** | Promotions : plus récente → plus ancienne                      |
+| **#12** | GPS : toutes les 10 secondes                                   |
+| **#13** | Historique GPS : 72 heures                                     |
+| **#15** | Réclamation : maximum 3 heures après confirmation de livraison |
+| **#16** | Une seule réclamation par commande                             |
+
+---
+
+# 249. CONTRÔLE FINAL DE COHÉRENCE
+
+Les règles relatives :
+
+* aux statuts ;
+* au stock ;
+* aux promotions ;
+* au GPS ;
+* aux réclamations ;
+* au chat ;
+* aux permissions ;
+* aux ingrédients ;
+* aux livreurs ;
+* au parcours Commander/Personnaliser
+
+doivent rester cohérentes dans toutes les parties du système.
+
+---
+
+# 250. VERSION
+
+**RAPPORT FINAL ABSOLU + LES 6 CLARIFICATIONS + CORRECTIONS V2**
+
+Cette version intègre les corrections et clarifications explicitement décidées.
+
+---
+
+# 251. STATUT FINAL
+
+Le présent document constitue la **version complète de référence** du cahier des charges BEBBA Healthy Food.
+
+Il comprend :
+
+* les exigences consolidées ;
+* les règles métier ;
+* les règles techniques ;
+* les règles de sécurité ;
+* les règles de permissions ;
+* les règles de stock ;
+* les règles de cuisine ;
+* les règles de livraison ;
+* les règles d'encaissement ;
+* les règles GPS ;
+* les règles de réclamation ;
+* les règles de traçabilité ;
+* les règles de tests ;
+* les six clarifications définitives ;
+* les corrections ajoutées ;
+* le parcours complet **Commander / Personnaliser**.
+
+**Nom officiel :**
+
+# RAPPORT FINAL ABSOLU + LES 6 CLARIFICATIONS + CORRECTIONS V2
+
+### BEBBA Healthy Food
+
+### « Vos Plats santé en un clic »
+
+**FIN DU CAHIER DES CHARGES**

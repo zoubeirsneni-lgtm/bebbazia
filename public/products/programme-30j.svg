@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e7f2e0"/><stop offset="1" stop-color="#c9e3ba"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="680" cy="90" r="150" fill="#b2d69c" opacity="0.45"/>
+  <circle cx="90" cy="530" r="130" fill="#b2d69c" opacity="0.35"/>
+  <circle cx="740" cy="500" r="70" fill="#b2d69c" opacity="0.30"/>
+  
+      
+  <ellipse cx="400" cy="470" rx="200" ry="26" fill="#000000" opacity="0.10"/>
+  <circle cx="400" cy="300" r="175" fill="#ffffff"/>
+  <circle cx="400" cy="300" r="150" fill="#f7f8f4"/>
+  <circle cx="400" cy="300" r="150" fill="none" stroke="#e8ece2" stroke-width="2"/>
+      <g>
+        <rect x="308" y="204" width="184" height="192" rx="20" fill="#ffffff" stroke="#dfe7d2" stroke-width="4"/>
+        <rect x="308" y="204" width="184" height="52" rx="20" fill="#7fae5e"/>
+        <rect x="308" y="236" width="184" height="20" fill="#7fae5e"/>
+        <circle cx="352" cy="230" r="8" fill="#ffffff"/><circle cx="448" cy="230" r="8" fill="#ffffff"/>
+        <g fill="#dbe8cd">
+          <rect x="326" y="272" width="44" height="30" rx="6"/><rect x="378" y="272" width="44" height="30" rx="6"/><rect x="430" y="272" width="44" height="30" rx="6"/>
+          <rect x="326" y="312" width="44" height="30" rx="6"/><rect x="378" y="312" width="44" height="30" rx="6"/><rect x="430" y="312" width="44" height="30" rx="6"/>
+          <rect x="326" y="352" width="44" height="30" rx="6"/><rect x="378" y="352" width="44" height="30" rx="6"/><rect x="430" y="352" width="44" height="30" rx="6"/>
+        </g>
+        <rect x="326" y="272" width="44" height="30" rx="6" fill="#8db863"/>
+        <rect x="430" y="312" width="44" height="30" rx="6" fill="#8db863"/>
+        <rect x="378" y="352" width="44" height="30" rx="6" fill="#8db863"/>
+      </g>
+      
+  <g transform="translate(282,250) scale(1)" fill="#6f9e57" opacity="0.9">
+    <path d="M0 0 C 18 -26, 52 -30, 66 -14 C 58 12, 22 20, 0 0 Z"/>
+    <path d="M14 -6 C 30 -14, 48 -14, 60 -10" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <g transform="translate(500,258) scale(-0.8)" fill="#6f9e57" opacity="0.7">
+    <path d="M0 0 C 18 -26, 52 -30, 66 -14 C 58 12, 22 20, 0 0 Z"/>
+    <path d="M14 -6 C 30 -14, 48 -14, 60 -10" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>
