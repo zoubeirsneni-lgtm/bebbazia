@@ -4,6 +4,7 @@
 // prioritaire, clé locale `bebba_last_tracking_token`. Rafraîchissement
 // automatique (polling 15 s) tant que la commande est en cours.
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   ArrowLeft, Banknote, CheckCircle2, ClipboardList, ChefHat, PackageCheck,
   Bike, RefreshCw, Search, ReceiptText, Timer,
@@ -21,6 +22,16 @@ import {
 } from "@/lib/track-types";
 import type { OrderStatus } from "@/lib/order-state";
 
+// Carte chargée uniquement côté client (Leaflet ne peut pas s'exécuter côté serveur)
+const TrackMap = dynamic(() => import("./track-map").then((m) => m.TrackMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[320px] items-center justify-center rounded-2xl border border-border/70 bg-muted/40 text-sm text-muted-foreground">
+      Chargement de la carte…
+    </div>
+  ),
+});
+
 // Icône par étape de la machine d'état (CDC #16)
 const STATUS_ICONS: Record<OrderStatus, React.ComponentType<{ className?: string }>> = {
   received: ClipboardList,
@@ -32,6 +43,9 @@ const STATUS_ICONS: Record<OrderStatus, React.ComponentType<{ className?: string
   cancelled: RefreshCw,
 };
 
+// Polling : 10 s pendant la livraison pour suivre le GPS du livreur (CDC #12),
+// 15 s pour les autres états actifs.
+const TRACKING_POLL_MS = 10_000;
 const ACTIVE_POLL_MS = 15_000;
 
 interface OrderTrackingProps {
@@ -96,11 +110,13 @@ export function OrderTracking({ initialToken, onBack }: OrderTrackingProps) {
     }
   }, [initialToken, lookup]);
 
-  // Polling tant que la commande n'est ni livrée ni annulée
+  // Polling tant que la commande n'est ni livrée ni annulée — cadence 10 s
+  // pendant delivering (suivi GPS temps réel)
   useEffect(() => {
     if (!order || !searchRef.current) return;
     if (order.status === "delivered" || order.status === "cancelled") return;
-    const id = setInterval(() => lookup(searchRef.current!, true), ACTIVE_POLL_MS);
+    const pollMs = order.status === "delivering" ? TRACKING_POLL_MS : ACTIVE_POLL_MS;
+    const id = setInterval(() => lookup(searchRef.current!, true), pollMs);
     return () => clearInterval(id);
   }, [order, lookup]);
 
@@ -176,6 +192,17 @@ export function OrderTracking({ initialToken, onBack }: OrderTrackingProps) {
 
       {order && (
         <div className="mt-8 space-y-5">
+          {/* Carte temps réel — UNIQUEMENT pendant la livraison (CDC #12 / #133) */}
+          {currentStatus === "delivering" && order.liveTracking && (
+            <TrackMap
+              driverPosition={order.liveTracking.driverPosition}
+              destination={order.liveTracking.destination}
+              driverName={order.liveTracking.driverFirstName}
+              distanceKm={order.liveTracking.distanceKm}
+              etaMinutes={order.liveTracking.etaMinutes}
+            />
+          )}
+
           {/* En-tête commande */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card p-5">
             <div>

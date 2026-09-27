@@ -45,6 +45,15 @@ export interface TrackOrder {
     total: number;
   };
   amountToCollect: number;
+  driverFirstName: string | null;
+  // Bloc 3 — carte temps réel : présent UNIQUEMENT pendant delivering (CDC #12/#133)
+  liveTracking: {
+    driverFirstName: string | null;
+    driverPosition: { lat: number; lng: number; recordedAt: string } | null;
+    destination: { resolved: boolean; lat: number | null; lng: number | null };
+    distanceKm: number | null;
+    etaMinutes: number | null;
+  } | null;
   items: TrackItem[];
   events: TrackEvent[];
 }

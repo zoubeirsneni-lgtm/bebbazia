@@ -1,9 +1,11 @@
 "use client";
 
-// Orchestrateur de l'expérience client Bloc 2 — BEBBA Healthy Food
-// Vitrine → configurateur produit (#11) → panier (#13) → checkout invité (#7/#8)
-// → confirmation (numéro #19 + token #20) → suivi temps réel.
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+// Orchestrateur de l'expérience BEBBA Healthy Food
+// Client : vitrine → personnalisation (#11) → panier (#13) → checkout invité
+// → confirmation → suivi temps réel (+ carte Bloc 3)
+// Équipe (Bloc 3) : cuisine KDS (#21) et espace livreur GPS (#34), accès par
+// PIN vérifié côté serveur (mesure transitoire — auth complète au Bloc 4).
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { SiteHeader } from "@/components/site/site-header";
@@ -16,6 +18,9 @@ import { CartSheet } from "@/components/site/cart-sheet";
 import { CheckoutDialog } from "@/components/site/checkout-dialog";
 import { ConfirmationDialog } from "@/components/site/confirmation-dialog";
 import { OrderTracking } from "@/components/site/order-tracking";
+import { StaffGate, staffStore, type DriverSessionInfo } from "@/components/site/staff-gate";
+import { KitchenView } from "@/components/site/kitchen-view";
+import { DriverView } from "@/components/site/driver-view";
 import { useCartStore } from "@/lib/cart-store";
 import type { OrderSummary } from "@/lib/order-types";
 import type { CategoryView, DeliveryZoneView, ProductView } from "@/components/site/types";
@@ -43,6 +48,34 @@ export function AppShell({ categories, products, zones, deliveryNote }: AppShell
   const [confirmedOrder, setConfirmedOrder] = useState<OrderSummary | null>(null);
   const [trackingOpen, setTrackingOpen] = useState(!!initialUrlToken);
   const [trackingToken, setTrackingToken] = useState<string | null>(initialUrlToken);
+
+  // Bloc 3 — vues équipe (kitchen | driver | null = vitrine/suivi)
+  const [staffView, setStaffView] = useState<"kitchen" | "driver" | null>(null);
+  // Sessions staff via store externe (useSyncExternalStore : hydratation propre)
+  const kitchenSession = useSyncExternalStore(
+    staffStore.subscribe,
+    staffStore.getKitchenSession,
+    () => null,
+  );
+  const driverSession = useSyncExternalStore(
+    staffStore.subscribe,
+    staffStore.getDriverSession,
+    () => null,
+  );
+  const [availableDrivers, setAvailableDrivers] = useState<{ id: string; name: string }[]>([]);
+  const driversLoadedRef = useRef(false);
+
+  const openStaffView = useCallback((view: "kitchen" | "driver") => {
+    if (view === "driver" && !driversLoadedRef.current) {
+      driversLoadedRef.current = true;
+      fetch("/api/driver/drivers")
+        .then((r) => (r.ok ? r.json() : { drivers: [] }))
+        .then((data) => setAvailableDrivers(data.drivers ?? []))
+        .catch(() => setAvailableDrivers([]));
+    }
+    setTrackingOpen(false);
+    setStaffView(view);
+  }, []);
 
   // Nettoyage de l'URL après ouverture via ?token= (effet sans setState)
   useEffect(() => {
@@ -89,20 +122,60 @@ export function AppShell({ categories, products, zones, deliveryNote }: AppShell
   };
 
   const openTracking = () => {
+    setStaffView(null);
     setTrackingToken(null);
     setTrackingOpen(true);
+  };
+
+  const openShop = () => {
+    setStaffView(null);
+    setTrackingOpen(false);
   };
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader
         cartCount={cartCount}
-        onOpenCart={() => setCartOpen(true)}
+        onOpenCart={() => {
+          if (staffView || trackingOpen) {
+            openShop();
+          }
+          setCartOpen(true);
+        }}
         onOpenTracking={openTracking}
+        onOpenKitchen={() => openStaffView("kitchen")}
+        onOpenDriver={() => openStaffView("driver")}
+        onGoHome={openShop}
       />
 
       <main className="flex-1">
-        {trackingOpen ? (
+        {staffView === "kitchen" ? (
+          kitchenSession ? (
+            <KitchenView pin={kitchenSession.pin} onExit={() => staffStore.clear("kitchen")} />
+          ) : (
+            <StaffGate
+              role="kitchen"
+              title="Espace cuisine"
+              description="Saisissez le code d'accès de la cuisine pour consulter la file de production."
+              onAuthenticated={() => setStaffView("kitchen")}
+            />
+          )
+        ) : staffView === "driver" ? (
+          driverSession ? (
+            <DriverView session={driverSession} onExit={() => staffStore.clear("driver")} />
+          ) : (
+            <StaffGate
+              role="driver"
+              needDriverSelection
+              drivers={availableDrivers}
+              title="Espace livreur"
+              description="Sélectionnez votre nom puis saisissez votre code d'accès."
+              onAuthenticated={(s) => {
+                if (s.driver) setStaffView("driver");
+              }}
+            />
+          )
+        ) : trackingOpen ? (
           <OrderTracking
             key={trackingToken ?? "manual"}
             initialToken={trackingToken}

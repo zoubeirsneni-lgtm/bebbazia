@@ -1,7 +1,10 @@
 // BEBBA Healthy Food — Schéma de base de données
 // Bloc 1 : Catalogue (catégories #9, produits #10 du cahier des charges)
+// Bloc 3 : Cuisine KDS, stock idempotent, livreurs GPS, carte (CDC #21-#35, #47-#48)
 // Convention prix : montants stockés en millimes (entier, TND à 3 décimales)
 // pour une précision financière déterministe (règles #65 et #179 du CDC).
+// Convention quantités de stock : milli-unités entières (1 g = 1000 milli-g)
+// pour une précision déterministe quelle que soit l'unité (CDC #26).
 
 generator client {
   provider = "prisma-client-js"
@@ -45,6 +48,7 @@ model Product {
   allergens    String?   // JSON: string[] — allergènes (CDC #170)
   prepMinutes  Int       @default(20) // temps de préparation indicatif (CDC #154)
   options      ProductOption[]
+  recipeLines  RecipeLine[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -102,6 +106,12 @@ model Order {
   paymentStatus   String  @default("to_collect")
   amountToCollect Int
   amountCollected Int     @default(0)
+  // Bloc 3 — livraison et stock
+  driverId          String?    // livreur affecté (CDC #33)
+  driver            Driver?    @relation(fields: [driverId], references: [id])
+  stockConsumedAt   DateTime?  // double garde d'idempotence de la consommation (CDC #22)
+  deliveryAttempts  Int        @default(0) // nombre de tentatives (CDC #159)
+  lastDeliveryIssue String?    // dernier motif d'échec/refus tracé (CDC #157 / #158)
   // Idempotence globale (CDC #85)
   idempotencyKey  String? @unique
   // Chronologie conservée (CDC #63) via OrderEvent
@@ -110,9 +120,12 @@ model Order {
 
   items  OrderItem[]
   events OrderEvent[]
+  driverLocations DriverLocation[]
+  stockMovements  StockMovement[]
 
   @@index([customerPhone])
   @@index([status])
+  @@index([driverId])
 }
 
 model OrderItem {
@@ -130,6 +143,7 @@ model OrderItem {
 }
 
 // Chronologie des événements d'une commande (CDC #63)
+// types : created | status_change | note | driver_assigned | driver_refused | delivery_failed | stock_consumed
 model OrderEvent {
   id         String   @id @default(cuid())
   orderId    String
@@ -162,4 +176,102 @@ model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ─── Bloc 3 — Stock et recettes (CDC #10, #21, #22, #23, #25, #26, #27) ──────
+// Quantités en milli-unités entières : 1 g = 1000, 1 ml = 1000, 1 pièce = 1000.
+// Unités explicites et aucune conversion implicite (CDC #26).
+
+model Ingredient {
+  id             String  @id @default(cuid())
+  name           String  @unique
+  unit           String  // "g" | "ml" | "piece" — unité explicite (CDC #26)
+  stockQuantity  Int     @default(0) // milli-unités — stock courant (CDC #25)
+  alertThreshold Int     @default(0) // milli-unités — seuil d'alerte (CDC #25)
+  costMillimesPer1000 Int @default(0) // coût en millimes pour 1000 unités de base (CDC #23)
+  isActive       Boolean @default(true)
+  movements      StockMovement[]
+  recipeLines    RecipeLine[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Recette : quantités par portion servie (CDC #27)
+model RecipeLine {
+  id                String     @id @default(cuid())
+  productId         String
+  product           Product    @relation(fields: [productId], references: [id])
+  ingredientId      String
+  ingredient        Ingredient @relation(fields: [ingredientId], references: [id])
+  quantityPerServing Int       // milli-unités par portion
+
+  @@unique([productId, ingredientId])
+  @@index([ingredientId])
+}
+
+// Mouvements de stock traçables (CDC #25)
+// types : consumption | restock | loss | inventory | waste
+// La contrainte @@unique([ingredientId, orderId, type]) garantit l'idempotence
+// de la consommation liée à une commande au niveau même de la base (CDC #22).
+model StockMovement {
+  id                String     @id @default(cuid())
+  ingredientId      String
+  ingredient        Ingredient @relation(fields: [ingredientId], references: [id])
+  orderId           String?
+  order             Order?     @relation(fields: [orderId], references: [id])
+  type              String
+  quantityMilliUnits Int       // signé : négatif = sortie de stock
+  note              String?
+  createdAt         DateTime   @default(now())
+
+  @@unique([ingredientId, orderId, type])
+  @@index([orderId])
+  @@index([ingredientId, createdAt])
+}
+
+// ─── Bloc 3 — Livreurs et GPS (CDC #30, #33, #34, #35) ─────────────────────
+
+model Driver {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  isActive  Boolean  @default(true) // disponibilité identifiable (CDC #160)
+  note      String?
+  orders    Order[]
+  locations DriverLocation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Position GPS transmise toutes les 10 s pendant delivering uniquement
+// (CDC #12 / #34 / #162). Rétention 72 h (CDC #13 / #35 / #163) : purge
+// opportuniste à chaque écriture + endpoint dédié.
+model DriverLocation {
+  id         String   @id @default(cuid())
+  driverId   String
+  driver     Driver   @relation(fields: [driverId], references: [id])
+  orderId    String?
+  order      Order?   @relation(fields: [orderId], references: [id])
+  lat        Float
+  lng        Float
+  accuracyM  Float?   // précision fournie par l'appareil, si disponible
+  speedKmh   Float?   // vitesse si disponible — jamais de valeur inventée
+  recordedAt DateTime @default(now())
+
+  @@index([driverId, recordedAt])
+  @@index([orderId, recordedAt])
+}
+
+// Cache de géocodage — Nominatim limite à 1 requête/s : toute adresse déjà
+// résolue est servie depuis ce cache (CDC #47 / #48).
+model GeocodeCache {
+  id          String   @id @default(cuid())
+  query       String   @unique
+  lat         Float?
+  lng         Float?
+  displayName String?
+  provider    String   @default("nominatim")
+  resolved    Boolean  @default(false) // false = adresse non géocodable (cas géré CDC #47)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
